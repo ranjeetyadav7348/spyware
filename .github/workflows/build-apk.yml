@@ -20,21 +20,11 @@ jobs:
         distribution: 'temurin'
         
     - name: Setup Android SDK
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y wget unzip
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-        unzip -q commandlinetools-linux-9477386_latest.zip
-        mkdir -p $HOME/android-sdk/cmdline-tools
-        mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
-        export ANDROID_HOME=$HOME/android-sdk
-        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
-        echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-        echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-        echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
-        yes | sdkmanager --licenses
-        sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-      
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 34
+        build-tools: 34.0.0
+        
     - name: Cache Gradle packages
       uses: actions/cache@v4
       with:
@@ -45,10 +35,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
           
-    - name: Create gradlew wrapper
-      run: |
-        gradle wrapper --gradle-version 8.4
-        chmod +x gradlew
+    - name: Make gradlew executable
+      run: chmod +x gradlew
       
     - name: Create local.properties
       run: |
@@ -62,13 +50,11 @@ jobs:
         echo "MAPS_API_KEY=AIzaSyBvOiF-HRTKgjguFG6SjpTL4U_FoHNBDc4" >> app/local.properties
       
     - name: Build Debug APK
-      run: |
-        export JAVA_TOOL_OPTIONS=""
-        ./gradlew assembleDebug --no-daemon --continue --stacktrace
+      run: ./gradlew assembleDebug --no-daemon --stacktrace
       
     - name: Upload APK
       uses: actions/upload-artifact@v4
-      if: always()
+      if: success()
       with:
         name: dash-debug-apk
         path: app/build/outputs/apk/debug/app-debug.apk
