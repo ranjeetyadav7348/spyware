@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "991074327138",
+    "project_id": "spyware-c4045",
+    "storage_bucket": "spyware-c4045.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991074327138:android:0376ba3f5a22a03eaa0f3b",
+        "android_client_info": {
+          "package_name": "com.github.muneebwanee.dash"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3CXXdGLWU0i6AcB__3zSPpbUDWHAZQLM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991074327138:android:0376ba3f5a22a03eaa0f3b",
+        "android_client_info": {
+          "package_name": "com.github.muneebwanee.dash.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3CXXdGLWU0i6AcB__3zSPpbUDWHAZQLM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
