@@ -1,8 +1,8 @@
-name: Build Android APK
+name: Android APK Build
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
     
     - name: Set up JDK 17
@@ -21,49 +21,48 @@ jobs:
         
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-      with:
-        api-level: 34
-        build-tools: 34.0.0
+      
+    - name: Accept Android SDK licenses
+      run: yes | sdkmanager --licenses
+      
+    - name: Install required SDK components
+      run: |
+        sdkmanager "platforms;android-34"
+        sdkmanager "build-tools;34.0.0"
         
-    - name: Cache Gradle packages
+    - name: Cache Gradle
       uses: actions/cache@v4
       with:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
           
-    - name: Make gradlew executable
-      run: chmod +x gradlew
-      
     - name: Create local.properties
       run: |
         echo "sdk.dir=$ANDROID_HOME" > local.properties
         echo "MAPS_API_KEY=AIzaSyBvOiF-HRTKgjguFG6SjpTL4U_FoHNBDc4" >> local.properties
         echo "SOCIAL_PACKAGE_NAME=com.github.muneebwanee.dash" >> local.properties
         
-    - name: Create app/local.properties
+    - name: Create app local.properties
       run: |
         echo "sdk.dir=$ANDROID_HOME" > app/local.properties
         echo "MAPS_API_KEY=AIzaSyBvOiF-HRTKgjguFG6SjpTL4U_FoHNBDc4" >> app/local.properties
       
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug --no-daemon --stacktrace
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+      
+    - name: Clean project
+      run: ./gradlew clean
+      
+    - name: Build APK
+      run: ./gradlew assembleDebug --no-daemon --stacktrace --continue
       
     - name: Upload APK
       uses: actions/upload-artifact@v4
-      if: success()
       with:
-        name: dash-debug-apk
-        path: app/build/outputs/apk/debug/app-debug.apk
-        
-    - name: Upload build logs
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: build-logs
-        path: |
-          build/reports/
-          app/build/reports/
+        name: android-apk
+        path: app/build/outputs/apk/debug/*.apk
+        retention-days: 30
